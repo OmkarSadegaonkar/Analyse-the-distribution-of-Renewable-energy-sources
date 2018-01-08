@@ -1,0 +1,194 @@
+select * from world_borders;
+select * from germany_power_plants_points;
+select * from world_renewable_energy_data;
+select * from Germany_Data;
+
+drop view if exists view_renewable_electricity_worldwide;
+create or replace view view_renewable_electricity_worldwide as
+select B.*, A."Value" from world_renewable_energy_data as A, world_borders as B WHERE A."Country Code" =  B."iso3";
+
+select count(*) as NumPoints from germany_power_plants_points as Pts, Germany_Data as Bd where st_contains(Bd.geom, Pts.geom)
+group by Bd.id; 
+
+ALTER table Germany_Data ADD COLUMN number_of_plants integer;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd where st_contains(Bd.geom, Pts.geom)
+group by Bd.id
+)
+update Germany_Data set number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+SELECT DISTINCT energy_source_level_2
+  FROM germany_power_plants_points
+
+
+ALTER table Germany_Data ADD COLUMN otherfossilfuels_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN wind_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN bioenergy_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN hydro_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN geothermal_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN speicher_number_of_plants integer;
+ALTER table Germany_Data ADD COLUMN solar_number_of_plants integer;
+
+update Germany_Data set solar_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+update Germany_Data set solar_number_of_plants = 0  where solar_number_of_plants IS NULL;
+update Germany_Data set speicher_number_of_plants = 0  where speicher_number_of_plants IS NULL;
+update Germany_Data set geothermal_number_of_plants = 0  where geothermal_number_of_plants IS NULL;
+update Germany_Data set hydro_number_of_plants = 0  where hydro_number_of_plants IS NULL;
+update Germany_Data set bioenergy_number_of_plants = 0  where bioenergy_number_of_plants IS NULL;
+update Germany_Data set wind_number_of_plants = 0  where wind_number_of_plants IS NULL;
+update Germany_Data set otherfossilfuels_number_of_plants = 0  where otherfossilfuels_number_of_plants IS NULL;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Other fossil fuels'
+group by Bd.id
+)
+update Germany_Data set otherfossilfuels_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Wind'
+group by Bd.id
+)
+update Germany_Data set wind_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Bioenergy'
+group by Bd.id
+)
+update Germany_Data set bioenergy_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Hydro'
+group by Bd.id
+)
+update Germany_Data set hydro_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Geothermal'
+group by Bd.id
+)
+update Germany_Data set geothermal_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Speicher'
+group by Bd.id
+)
+update Germany_Data set speicher_number_of_plants = TSubQry.NumPoints from TSubQry where Germany_Data.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from germany_power_plants_points as Pts, Germany_Data as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Solar'
+group by Bd.id
+)
+
+
+
+-- France work
+select * from france_pts;
+select * from france_boundaries;
+
+select count(*) as NumPoints from france_pts as Pts, france_boundaries as Bd where st_contains(Bd.geom, Pts.geom)
+group by Bd.id; 
+
+ALTER table france_boundaries ADD COLUMN number_of_plants integer;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd where st_contains(Bd.geom, Pts.geom)
+group by Bd.id
+)
+update france_boundaries set number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+SELECT DISTINCT energy_source_level_2
+  FROM france_pts;
+ALTER table france_boundaries ADD COLUMN Density real;
+ALTER table france_boundaries ADD COLUMN wind_number_of_plants integer;
+ALTER table france_boundaries ADD COLUMN bioenergy_number_of_plants integer;
+ALTER table france_boundaries ADD COLUMN hydro_number_of_plants integer;
+ALTER table france_boundaries ADD COLUMN geothermal_number_of_plants integer;
+ALTER table france_boundaries ADD COLUMN solar_number_of_plants integer;
+
+update france_boundaries set Density = 0;
+update france_boundaries set solar_number_of_plants = 0  where solar_number_of_plants IS NULL;
+update france_boundaries set geothermal_number_of_plants = 0  where geothermal_number_of_plants IS NULL;
+update france_boundaries set hydro_number_of_plants = 0  where hydro_number_of_plants IS NULL;
+update france_boundaries set bioenergy_number_of_plants = 0  where bioenergy_number_of_plants IS NULL;
+update france_boundaries set wind_number_of_plants = 0  where wind_number_of_plants IS NULL;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Wind'
+group by Bd.id
+)
+update france_boundaries set wind_number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Bioenergy'
+group by Bd.id
+)
+update france_boundaries set bioenergy_number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Hydro'
+group by Bd.id
+)
+update france_boundaries set hydro_number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Geothermal'
+group by Bd.id
+)
+update france_boundaries set geothermal_number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+
+WITH TSubQry as (
+select count(*) as NumPoints, Bd.id from france_pts as Pts, france_boundaries as Bd 
+where st_contains(Bd.geom, Pts.geom) and Pts.energy_source_level_2 = 'Solar'
+group by Bd.id
+)
+update france_boundaries set solar_number_of_plants = TSubQry.NumPoints from TSubQry where france_boundaries.id = TSubQry.id;
+
+update france_boundaries set density = number_of_plants/(ST_Area(ST_Transform(geom,2163))/1000000)*100;
+update france_boundaries set Density = 0 where density is null;
+-- Swiss data work
+
+select * from switzerland_pts;
+
+SELECT DISTINCT energy_source_level_2
+  FROM switzerland_pts;
+  
+--Nearest Solar energy plants
+select A.municipality,B.municipality,st_distance(st_transform(A.geom,2163), st_transform(B.geom,2163))/1000 as Dist from switzerland_pts as A, switzerland_pts as B where
+(A.id != B.id) and (A.energy_source_level_2 = 'Solar') and (B.energy_source_level_2 = 'Solar') order by Dist asc limit 10;
+
+-- Farthest Hydro energy plants
+select A.municipality,B.municipality, st_distance(st_transform(A.geom,2163), st_transform(B.geom,2163))/1000 as Dist from switzerland_pts as A, switzerland_pts as B where
+(B.id != A.id) and (A.energy_source_level_2 = 'Hydro') and (B.energy_source_level_2 = 'Hydro') order by Dist desc limit 10;
+
+-- Distance between all Bioenergy plants is given by
+select A.municipality,B.municipality,st_distance(st_transform(A.geom,2163), st_transform(B.geom,2163)) as Dist from switzerland_pts as A, switzerland_pts as B where
+(A.id != B.id) and(A.energy_source_level_2 = 'Bioenergy') and (B.energy_source_level_2 = 'Bioenergy') order by Dist asc;
+
+-- The renewable energy plants within 10km of Bern city 
+select municipality, energy_source_level_2 from switzerland_pts where 
+st_dwithin(st_transform(st_geomfromtext('POINT(6.143158 46.204391)',4326),2163),st_transform(geom,2163),10000);
+
+-- The renewable energy plants in given envelope
+select municipality,energy_source_level_2 from switzerland_pts where st_makeenvelope(8.2434,46.8231,8.7059,47.1742,4326) && geom;
+
